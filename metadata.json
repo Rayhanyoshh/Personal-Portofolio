@@ -1,0 +1,5 @@
+{
+  "name": "PortoBuilder AI",
+  "description": "An interactive portfolio builder that guides you on what information is needed and helps you polish it using Gemini AI.",
+  "requestFramePermissions": []
+}
