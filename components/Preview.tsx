@@ -1,14 +1,43 @@
 import React from 'react';
 import { PortfolioData } from '../types';
-import { Mail, Linkedin, Github, ExternalLink, Activity, Cpu, Database, Terminal, Shield } from 'lucide-react';
+import { Mail, Linkedin, Github, ExternalLink, Activity, Cpu, Database, Terminal, Shield, Copy } from 'lucide-react';
+import { TerminalHero } from './TerminalHero';
+import { VantaBackground } from './VantaBackground';
+import { GitHubStats } from './GitHubStats';
+import { ScrollAnimation } from './ScrollAnimation';
+import { Parallax } from './Parallax';
+import { TiltCard } from './TiltCard';
+import { SkillProgress } from './SkillProgress';
+import { useToast } from './Toast';
 
 interface PreviewProps {
   data: PortfolioData;
 }
 
+// Extract username from GitHub URL
+const extractGitHubUsername = (url: string): string => {
+  if (!url) return '';
+  const match = url.match(/github\.com\/([^\/]+)/);
+  return match ? match[1] : '';
+};
+
 export const Preview: React.FC<PreviewProps> = ({ data }) => {
+  const githubUsername = extractGitHubUsername(data.github);
+  const { showToast } = useToast();
+
+  const copyEmailToClipboard = async () => {
+    if (data.email) {
+      try {
+        await navigator.clipboard.writeText(data.email);
+        showToast('success', 'Email copied to clipboard!');
+      } catch (err) {
+        showToast('error', 'Failed to copy email');
+      }
+    }
+  };
+
   return (
-    <div className="h-full overflow-y-auto bg-slate-950 text-slate-100 font-sans grid-bg relative selection:bg-cyan-500 selection:text-black">
+    <div className="h-full overflow-y-auto bg-slate-950 text-slate-100 font-sans relative selection:bg-cyan-500 selection:text-black">
       {/* HUD Overlay Effects */}
       <div className="fixed top-0 left-0 w-full h-2 bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent z-50 pointer-events-none"></div>
       <div className="fixed bottom-0 right-0 p-4 font-tech text-[10px] text-cyan-800 opacity-50 pointer-events-none z-50">
@@ -32,80 +61,114 @@ export const Preview: React.FC<PreviewProps> = ({ data }) => {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-6 py-12 space-y-24">
-        
-        {/* Intro / Identity Section */}
-        <section id="about" className="relative group">
-            {/* Decorative Side Borders */}
-            <div className="absolute -left-2 top-0 bottom-0 w-[1px] bg-gradient-to-b from-cyan-500/0 via-cyan-500/50 to-cyan-500/0"></div>
-            
-            <div className="space-y-4 pl-6 border-l-2 border-cyan-500/20">
-                <div className="inline-flex items-center gap-2 px-2 py-1 bg-cyan-900/20 border border-cyan-500/30 text-cyan-400 text-xs font-tech tracking-wider rounded">
-                    <Shield size={12} /> IDENTITY VERIFIED
-                </div>
-                <h2 className="font-hero text-6xl md:text-7xl font-bold tracking-tight text-white uppercase leading-none">
-                    {data.fullName || "UNKNOWN USER"}
-                </h2>
-                <h3 className="font-tech text-2xl text-cyan-500 tracking-widest uppercase border-b border-slate-800 pb-4 inline-block">
-                    // {data.title || "SYSTEM OPERATOR"}
-                </h3>
-                <p className="text-lg text-slate-400 leading-relaxed max-w-2xl font-light border-l border-slate-800 pl-4 mt-6">
-                    {data.bio || "No biography data detected in system core."}
-                </p>
-            
-                <div className="flex gap-4 pt-6">
-                     {data.email && (
-                        <a href={`mailto:${data.email}`} className="group relative px-6 py-2 bg-slate-900 overflow-hidden font-tech text-cyan-400 text-sm border border-cyan-500/30 hover:border-cyan-400 transition-all tech-border">
-                            <div className="absolute inset-0 w-0 bg-cyan-500/10 transition-all duration-[250ms] ease-out group-hover:w-full"></div>
-                            <span className="relative flex items-center gap-2"><Mail size={16} /> INITIALIZE_COMMS</span>
-                        </a>
-                     )}
-                     {data.github && (
-                         <a href={data.github} target="_blank" rel="noopener noreferrer" className="p-2 text-slate-400 hover:text-white transition-colors border border-slate-700 hover:border-white rounded-sm bg-slate-900">
-                            <Github size={20} />
-                         </a>
-                     )}
-                     {data.linkedin && (
-                         <a href={data.linkedin} target="_blank" rel="noopener noreferrer" className="p-2 text-slate-400 hover:text-cyan-400 transition-colors border border-slate-700 hover:border-cyan-400 rounded-sm bg-slate-900">
-                            <Linkedin size={20} />
-                         </a>
-                     )}
-                </div>
-            </div>
+      {/* Hero Section with Vanta Background */}
+      <VantaBackground>
+        <section id="about" className="min-h-[80vh] flex flex-col justify-center items-center py-20 px-6">
+          <TerminalHero 
+            fullName={data.fullName || "Unknown User"}
+            title={data.title || "System Operator"}
+            bio={data.bio || "No biography data detected."}
+          />
+          
+          {/* Social Links */}
+          <div className="flex gap-4 mt-8 z-10">
+            {data.email && (
+              <>
+                <a href={`mailto:${data.email}`} className="group relative px-6 py-2 bg-slate-900/80 overflow-hidden font-tech text-cyan-400 text-sm border border-cyan-500/30 hover:border-cyan-400 transition-all tech-border backdrop-blur-sm">
+                  <div className="absolute inset-0 w-0 bg-cyan-500/10 transition-all duration-[250ms] ease-out group-hover:w-full"></div>
+                  <span className="relative flex items-center gap-2"><Mail size={16} /> INITIALIZE_COMMS</span>
+                </a>
+                <button
+                  onClick={copyEmailToClipboard}
+                  className="p-2 text-slate-400 hover:text-cyan-400 transition-colors border border-slate-700 hover:border-cyan-400 rounded-sm bg-slate-900/80 backdrop-blur-sm group"
+                  title="Copy email to clipboard"
+                >
+                  <Copy size={20} className="group-hover:scale-110 transition-transform" />
+                </button>
+              </>
+            )}
+            {data.github && (
+              <a href={data.github} target="_blank" rel="noopener noreferrer" className="p-2 text-slate-400 hover:text-white transition-colors border border-slate-700 hover:border-white rounded-sm bg-slate-900/80 backdrop-blur-sm">
+                <Github size={20} />
+              </a>
+            )}
+            {data.linkedin && (
+              <a href={data.linkedin} target="_blank" rel="noopener noreferrer" className="p-2 text-slate-400 hover:text-cyan-400 transition-colors border border-slate-700 hover:border-cyan-400 rounded-sm bg-slate-900/80 backdrop-blur-sm">
+                <Linkedin size={20} />
+              </a>
+            )}
+          </div>
         </section>
+      </VantaBackground>
+
+      <main className="max-w-5xl mx-auto px-6 py-12 space-y-24">
 
         {/* Skills / System Capabilities */}
-        <section id="skills" className="space-y-6">
-            <div className="flex items-center gap-4 mb-8">
-                 <div className="h-[1px] flex-1 bg-slate-800"></div>
-                 <h4 className="font-hero text-2xl font-bold text-slate-200 flex items-center gap-2 uppercase tracking-widest">
-                    <Cpu className="text-cyan-500 animate-pulse" /> System Capabilities
+        <ScrollAnimation animation="fade-up">
+          <section id="skills" className="space-y-6">
+              <div className="flex items-center gap-4 mb-8">
+                   <div className="h-[1px] flex-1 bg-slate-800"></div>
+                   <h4 className="font-hero text-2xl font-bold text-slate-200 flex items-center gap-2 uppercase tracking-widest">
+                      <Cpu className="text-cyan-500 animate-pulse" /> System Capabilities
+                  </h4>
+                  <div className="h-[1px] flex-1 bg-slate-800"></div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {data.skills.length > 0 ? (
+                      data.skills.map((skill, index) => {
+                          // Define skill levels (you can customize this)
+                          const skillLevels: Record<string, number> = {
+                            'Node.js': 90,
+                            'Vue.js': 85,
+                            'Next.js': 88,
+                            '.NET 8': 92,
+                            'C#': 90,
+                            'SQL Server': 85,
+                            'MySQL': 83,
+                            'Python': 80,
+                            'SignalR': 85,
+                            'TypeScript': 87,
+                            'Tailwind CSS': 90,
+                          };
+                          
+                          return (
+                            <SkillProgress
+                              key={index}
+                              skill={skill}
+                              level={skillLevels[skill] || 75}
+                              yearsOfExperience={index < 4 ? 2 : 1} // Customize as needed
+                              index={index}
+                            />
+                          );
+                      })
+                  ) : (
+                      <span className="text-slate-600 font-tech">AWAITING DATA INPUT...</span>
+                  )}
+              </div>
+          </section>
+        </ScrollAnimation>
+
+        {/* GitHub Stats Section */}
+        {githubUsername && (
+          <ScrollAnimation animation="fade-up" delay={100}>
+            <section id="github" className="space-y-6">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="h-[1px] flex-1 bg-slate-800"></div>
+                <h4 className="font-hero text-2xl font-bold text-slate-200 flex items-center gap-2 uppercase tracking-widest">
+                  <Github className="text-cyan-500" /> GitHub Activity
                 </h4>
                 <div className="h-[1px] flex-1 bg-slate-800"></div>
-            </div>
-            
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {data.skills.length > 0 ? (
-                    data.skills.map((skill, index) => (
-                        <div key={index} className="relative group bg-slate-900/50 border border-slate-800 hover:border-cyan-500/50 p-3 transition-all duration-300">
-                            <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-cyan-500/0 group-hover:border-cyan-500 transition-colors"></div>
-                            <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-cyan-500/0 group-hover:border-cyan-500 transition-colors"></div>
-                            <div className="flex justify-between items-center">
-                                <span className="font-tech text-sm text-cyan-100">{skill}</span>
-                                <div className="h-1.5 w-12 bg-slate-800 rounded-full overflow-hidden">
-                                    <div className="h-full bg-cyan-600 w-[85%] group-hover:animate-pulse"></div>
-                                </div>
-                            </div>
-                        </div>
-                    ))
-                ) : (
-                    <span className="text-slate-600 font-tech">AWAITING DATA INPUT...</span>
-                )}
-            </div>
-        </section>
+              </div>
+              
+              <GitHubStats username={githubUsername} />
+            </section>
+          </ScrollAnimation>
+        )}
 
         {/* Experience / Mission Logs */}
-        <section id="experience" className="space-y-10">
+        <ScrollAnimation animation="fade-up" delay={200}>
+          <section id="experience" className="space-y-10">
             <h4 className="font-hero text-3xl font-bold text-white flex items-center gap-3 border-b border-slate-800 pb-4">
                 <Activity className="text-amber-500" /> MISSION LOGS
             </h4>
@@ -146,9 +209,11 @@ export const Preview: React.FC<PreviewProps> = ({ data }) => {
                 )}
             </div>
         </section>
+        </ScrollAnimation>
 
-        {/* Projects / Schematics - The Core Request */}
-        <section id="projects" className="space-y-10">
+        {/* Projects / Schematics */}
+        <ScrollAnimation animation="fade-up" delay={300}>
+          <section id="projects" className="space-y-10">
             <h4 className="font-hero text-3xl font-bold text-white flex items-center gap-3">
                 <Database className="text-cyan-500" /> PROJECT SCHEMATICS
             </h4>
@@ -156,7 +221,8 @@ export const Preview: React.FC<PreviewProps> = ({ data }) => {
             <div className="grid grid-cols-1 gap-8">
                 {data.projects.length > 0 ? (
                     data.projects.map((project) => (
-                        <div key={project.id} className="group relative bg-slate-900 border border-slate-800 tech-border hover:shadow-[0_0_20px_rgba(6,182,212,0.15)] transition-all duration-300">
+                        <TiltCard key={project.id}>
+                          <div className="group relative bg-slate-900 border border-slate-800 tech-border hover:shadow-[0_0_20px_rgba(6,182,212,0.15)] transition-all duration-300">
                             
                             {/* Hover Scanline Effect */}
                             <div className="absolute inset-0 opacity-0 group-hover:opacity-100 pointer-events-none overflow-hidden tech-border z-0">
@@ -218,6 +284,7 @@ export const Preview: React.FC<PreviewProps> = ({ data }) => {
                             <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-cyan-500/30 group-hover:border-cyan-400 transition-colors rounded-tr-[10px]"></div>
                             <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-cyan-500/30 group-hover:border-cyan-400 transition-colors rounded-bl-[10px]"></div>
                         </div>
+                        </TiltCard>
                     ))
                 ) : (
                     <div className="p-10 border border-dashed border-slate-800 text-center font-tech text-slate-600">
@@ -225,7 +292,8 @@ export const Preview: React.FC<PreviewProps> = ({ data }) => {
                     </div>
                 )}
             </div>
-        </section>
+          </section>
+        </ScrollAnimation>
 
         {/* Footer */}
         <footer id="contact" className="pt-20 pb-10 text-center border-t border-slate-800 bg-gradient-to-t from-black to-transparent">
