@@ -89,10 +89,10 @@ export const CursorFollower: React.FC = () => {
         ref={cursorRef}
         className="fixed top-0 left-0 pointer-events-none z-[9999] mix-blend-difference"
         style={{
-          width: cursor.isHovering ? 60 : cursor.isClicking ? 45 : 50,
-          height: cursor.isHovering ? 60 : cursor.isClicking ? 45 : 50,
-          marginLeft: cursor.isHovering ? -30 : cursor.isClicking ? -22.5 : -25,
-          marginTop: cursor.isHovering ? -30 : cursor.isClicking ? -22.5 : -25,
+          width: cursor.isHovering ? 40 : cursor.isClicking ? 28 : 32, // Reduced from 60/45/50
+          height: cursor.isHovering ? 40 : cursor.isClicking ? 28 : 32,
+          marginLeft: cursor.isHovering ? -20 : cursor.isClicking ? -14 : -16,
+          marginTop: cursor.isHovering ? -20 : cursor.isClicking ? -14 : -16,
           willChange: 'transform',
           transition: 'width 0.1s, height 0.1s, margin 0.1s',
         }}
@@ -134,10 +134,10 @@ export const CursorFollower: React.FC = () => {
         ref={dotRef}
         className="fixed top-0 left-0 pointer-events-none z-[10000]"
         style={{
-          width: 20,
-          height: 20,
-          marginLeft: -10,
-          marginTop: -10,
+          width: 14, // Reduced from 20
+          height: 14,
+          marginLeft: -7,
+          marginTop: -7,
           willChange: 'transform',
         }}
       >
