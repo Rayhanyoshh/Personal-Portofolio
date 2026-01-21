@@ -70,6 +70,7 @@ const INITIAL_DATA: PortfolioData = {
 };
 import { CyberpunkDino } from './components/CyberpunkDino';
 import { Gamepad2 } from 'lucide-react';
+import { FaviconManager } from './components/FaviconManager';
 
 const App: React.FC = () => {
   const [data] = useState<PortfolioData>(INITIAL_DATA);
@@ -79,6 +80,9 @@ const App: React.FC = () => {
   return (
     <ToastProvider>
       <div className="min-h-screen bg-black text-gray-200">
+        {/* Animated Favicon */}
+        <FaviconManager />
+        
         {/* Reading Progress Bar */}
         <ReadingProgress />
         
