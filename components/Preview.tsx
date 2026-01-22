@@ -256,6 +256,26 @@ export const Preview: React.FC<PreviewProps> = ({ data }) => {
 
                                 {/* Right: Details & Terminal View */}
                                 <div className="md:w-2/3 flex flex-col">
+                                    {/* Project Preview Image (GIF/Static) */}
+                                    {project.image && (
+                                        <div className="mb-4 rounded border border-slate-700 overflow-hidden relative group/image">
+                                            {/* CRT Overlay */}
+                                            <div className="absolute inset-0 bg-cyan-500/5 mix-blend-overlay z-10 pointer-events-none"></div>
+                                            <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] bg-[length:100%_4px] pointer-events-none z-20 opacity-20"></div>
+                                            
+                                            <img 
+                                                src={project.image} 
+                                                alt={project.title} 
+                                                className="w-full h-auto object-cover opacity-90 group-hover/image:opacity-100 transition-opacity duration-500 grayscale group-hover/image:grayscale-0" 
+                                            />
+                                            
+                                            {/* Live Tag */}
+                                            <div className="absolute top-2 right-2 bg-red-500/80 text-white text-[10px] font-bold px-2 py-0.5 rounded animate-pulse z-30 font-mono">
+                                                REC ●
+                                            </div>
+                                        </div>
+                                    )}
+
                                     <div className="flex-1 font-mono text-sm text-slate-300 leading-relaxed bg-black/30 p-4 rounded border border-slate-800/50 mb-4">
                                         <div className="flex gap-1.5 mb-2 opacity-50">
                                             <div className="w-2.5 h-2.5 rounded-full bg-red-500/50"></div>

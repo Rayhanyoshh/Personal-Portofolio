@@ -39,7 +39,15 @@ const INITIAL_DATA: PortfolioData = {
       title: 'Daimler Andon System',
       role: 'Full Stack Developer',
       description: 'Real-time Factory Management Dashboard (Andon) designed to enhance operational efficiency. Features live production monitoring using SignalR, dynamic RBAC, and interactive data visualization. Built with Monorepo architecture (Next.js 16 & .NET 8), incorporating industrial-grade security (JWT) and hybrid database synchronization (Cloud/Local).',
-      tags: ['Next.js 16', '.NET 8', 'SignalR', 'MySQL', 'TypeScript', 'Tailwind CSS 4'],
+      tags: ['Next.js 16', '.NET 8', 'SignalR', 'MySQL', 'TypeScript', 'Tailwind CSS 4', 'Jotai', 'Zod', 'Recharts'],
+      link: ''
+    },
+    {
+      id: 'p5',
+      title: 'Dangae Kanban Barcode System',
+      role: 'Full Stack Developer',
+      description: 'Digital Kanban inventory management system integrated with barcode scanning for real-time tracking on the production floor (Gemba). Features "Switch Matrix" for dynamic flow configuration, dual-layer security (User + Device Auth), and Final Inspection modules. Built with high-performance asynchronous Python backend (FastAPI) to handle concurrent scanning operations.',
+      tags: ['FastAPI', 'Python', 'Next.js', 'TypeScript', 'MySQL', 'SQLAlchemy', 'Alembic'],
       link: ''
     },
     {
@@ -71,9 +79,13 @@ const INITIAL_DATA: PortfolioData = {
 import { CyberpunkDino } from './components/CyberpunkDino';
 import { Gamepad2 } from 'lucide-react';
 import { FaviconManager } from './components/FaviconManager';
+import demoGif from './components/project-preview.gif';
 
 const App: React.FC = () => {
-  const [data] = useState<PortfolioData>(INITIAL_DATA);
+  const [data] = useState<PortfolioData>({
+    ...INITIAL_DATA,
+    projects: INITIAL_DATA.projects.map(p => ({ ...p, image: demoGif }))
+  });
   const [showEasterEgg, setShowEasterEgg] = useState(false);
   const [showGame, setShowGame] = useState(false);
 

@@ -1,5 +1,5 @@
 {
-  "name": "PortoBuilder AI",
-  "description": "An interactive portfolio builder that guides you on what information is needed and helps you polish it using Gemini AI.",
+  "name": "Personal Portfolio",
+  "description": "Rayhan Yoshara's personal portfolio website featuring interactive elements and full-stack projects.",
   "requestFramePermissions": []
 }
