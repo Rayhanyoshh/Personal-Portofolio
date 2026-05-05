@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { Preview } from './components/Preview';
 import { PortfolioData } from './types';
-import { CursorFollower } from './components/CursorFollower';
 import { MatrixRain } from './components/MatrixRain';
 import { FloatingIcons } from './components/FloatingIcons';
-import { ParticleExplosion } from './components/ParticleExplosion';
 import { ToastProvider } from './components/Toast';
 import { ReadingProgress } from './components/ReadingProgress';
 import { KonamiCode, EasterEggModal } from './components/KonamiCode';
+import { CyberpunkDino } from './components/CyberpunkDino';
+import { Gamepad2 } from 'lucide-react';
+import { FaviconManager } from './components/FaviconManager';
+import { BootSequence } from './components/BootSequence';
+import demoGif from './components/project-preview.gif';
 
 const INITIAL_DATA: PortfolioData = {
   fullName: 'Rayhan Yoshara',
@@ -70,16 +73,12 @@ const INITIAL_DATA: PortfolioData = {
       id: 'p3',
       title: 'Foreman Work Proof Middleware',
       role: 'Automation Engineer',
-      description: 'Built an intelligent automation middleware for the Foreman\'s Work Proof (BKM) process. The system reads and processes Excel attachments directly from Lark, significantly reducing manual labor and human error.',
+      description: "Built an intelligent automation middleware for the Foreman's Work Proof (BKM) process. The system reads and processes Excel attachments directly from Lark, significantly reducing manual labor and human error.",
       tags: ['Node.js', 'Excel Processing', 'Lark Integration'],
       link: ''
     }
   ]
 };
-import { CyberpunkDino } from './components/CyberpunkDino';
-import { Gamepad2 } from 'lucide-react';
-import { FaviconManager } from './components/FaviconManager';
-import demoGif from './components/project-preview.gif';
 
 const App: React.FC = () => {
   const [data] = useState<PortfolioData>({
@@ -88,10 +87,14 @@ const App: React.FC = () => {
   });
   const [showEasterEgg, setShowEasterEgg] = useState(false);
   const [showGame, setShowGame] = useState(false);
+  const [booted, setBooted] = useState(false);
 
   return (
     <ToastProvider>
-      <div className="min-h-screen bg-black text-gray-200">
+      {/* Boot Sequence */}
+      {!booted && <BootSequence onComplete={() => setBooted(true)} />}
+
+      <div className={`min-h-screen bg-black text-gray-200 transition-opacity duration-500 ${booted ? 'opacity-100' : 'opacity-0'}`}>
         {/* Animated Favicon */}
         <FaviconManager />
         
@@ -111,10 +114,8 @@ const App: React.FC = () => {
         {showGame && <CyberpunkDino onClose={() => setShowGame(false)} />}
         
         {/* Interactive Animations */}
-        <CursorFollower />
         <MatrixRain />
         <FloatingIcons />
-        <ParticleExplosion />
         
         {/* Main Portfolio Content */}
         <Preview data={data} />

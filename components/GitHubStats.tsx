@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Github, Users, BookOpen, GitFork, Activity } from 'lucide-react';
+import { CountUp } from './CountUp';
 
 interface GitHubStatsProps {
   username: string;
@@ -72,7 +73,7 @@ export const GitHubStats: React.FC<GitHubStatsProps> = ({ username }) => {
             <BookOpen className="text-cyan-500" size={24} />
             <span className="font-tech text-[10px] text-slate-500 uppercase">Repositories</span>
           </div>
-          <p className="font-hero text-4xl font-bold text-white">{userData.public_repos}</p>
+          <p className="font-hero text-4xl font-bold text-white"><CountUp end={userData.public_repos} duration={1800} /></p>
           <p className="text-slate-500 text-xs font-tech mt-1">PUBLIC REPOS</p>
         </div>
 
@@ -82,7 +83,7 @@ export const GitHubStats: React.FC<GitHubStatsProps> = ({ username }) => {
             <Users className="text-amber-500" size={24} />
             <span className="font-tech text-[10px] text-slate-500 uppercase">Network</span>
           </div>
-          <p className="font-hero text-4xl font-bold text-white">{userData.followers}</p>
+          <p className="font-hero text-4xl font-bold text-white"><CountUp end={userData.followers} duration={1500} /></p>
           <p className="text-slate-500 text-xs font-tech mt-1">FOLLOWERS</p>
         </div>
 
@@ -92,7 +93,7 @@ export const GitHubStats: React.FC<GitHubStatsProps> = ({ username }) => {
             <GitFork className="text-green-500" size={24} />
             <span className="font-tech text-[10px] text-slate-500 uppercase">Connections</span>
           </div>
-          <p className="font-hero text-4xl font-bold text-white">{userData.following}</p>
+          <p className="font-hero text-4xl font-bold text-white"><CountUp end={userData.following} duration={1200} /></p>
           <p className="text-slate-500 text-xs font-tech mt-1">FOLLOWING</p>
         </div>
       </div>

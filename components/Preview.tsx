@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { PortfolioData } from '../types';
-import { Mail, Linkedin, Github, ExternalLink, Activity, Cpu, Database, Terminal, Shield, Copy } from 'lucide-react';
+import { Mail, Linkedin, Github, ExternalLink, Activity, Cpu, Database, Terminal, Shield, Copy, Menu, X } from 'lucide-react';
 import { TerminalHero } from './TerminalHero';
 import { VantaBackground } from './VantaBackground';
 import { GitHubStats } from './GitHubStats';
 import { ScrollAnimation } from './ScrollAnimation';
 import { Parallax } from './Parallax';
 import { TiltCard } from './TiltCard';
-import { SkillProgress } from './SkillProgress';
 import { useToast } from './Toast';
+import { HeroCoreScene } from './HeroCoreScene';
+import { SkillCloud3D } from './SkillCloud3D';
 
 interface PreviewProps {
   data: PortfolioData;
@@ -21,9 +22,18 @@ const extractGitHubUsername = (url: string): string => {
   return match ? match[1] : '';
 };
 
+const NAV_ITEMS = [
+  { id: 'about', label: 'IDENTITY' },
+  { id: 'skills', label: 'SYSTEMS' },
+  { id: 'projects', label: 'SCHEMATICS' },
+  { id: 'experience', label: 'LOGS' },
+];
+
 export const Preview: React.FC<PreviewProps> = ({ data }) => {
   const githubUsername = extractGitHubUsername(data.github);
   const { showToast } = useToast();
+  const [activeSection, setActiveSection] = useState('about');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const copyEmailToClipboard = async () => {
     if (data.email) {
@@ -36,8 +46,37 @@ export const Preview: React.FC<PreviewProps> = ({ data }) => {
     }
   };
 
+  // Track active section with IntersectionObserver
+  useEffect(() => {
+    const observers: IntersectionObserver[] = [];
+    NAV_ITEMS.forEach(({ id }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const obs = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setActiveSection(id);
+          }
+        },
+        { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+      );
+      obs.observe(el);
+      observers.push(obs);
+    });
+    return () => observers.forEach(obs => obs.disconnect());
+  }, []);
+
+  // Smooth scroll handler
+  const scrollTo = useCallback((id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    setMobileMenuOpen(false);
+  }, []);
+
   return (
-    <div className="h-full overflow-y-auto bg-slate-950 text-slate-100 font-sans relative selection:bg-cyan-500 selection:text-black">
+    <div className="h-full overflow-y-auto bg-slate-950 text-slate-100 font-sans relative selection:bg-cyan-500 selection:text-black scroll-smooth">
       {/* HUD Overlay Effects */}
       <div className="fixed top-0 left-0 w-full h-2 bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent z-50 pointer-events-none"></div>
       <div className="fixed bottom-0 right-0 p-4 font-tech text-[10px] text-cyan-800 opacity-50 pointer-events-none z-50">
@@ -53,22 +92,80 @@ export const Preview: React.FC<PreviewProps> = ({ data }) => {
                     {data.fullName ? data.fullName.split(' ')[0] : "USER"}<span className="text-cyan-500">.LOG</span>
                 </h1>
             </div>
-            <nav className="flex gap-6 font-tech text-xs tracking-widest text-cyan-500/80">
-                <a href="#about" className="hover:text-cyan-400 hover:shadow-[0_0_8px_#06b6d4] transition-all">[ IDENTITY ]</a>
-                <a href="#projects" className="hover:text-cyan-400 hover:shadow-[0_0_8px_#06b6d4] transition-all">[ SCHEMATICS ]</a>
-                <a href="#experience" className="hover:text-cyan-400 hover:shadow-[0_0_8px_#06b6d4] transition-all">[ LOGS ]</a>
+
+            {/* Desktop nav */}
+            <nav className="hidden md:flex gap-6 font-tech text-xs tracking-widest text-cyan-500/80">
+                {NAV_ITEMS.map(({ id, label }) => (
+                  <button
+                    key={id}
+                    onClick={() => scrollTo(id)}
+                    className={`transition-all duration-300 ${
+                      activeSection === id
+                        ? 'text-cyan-400 shadow-[0_0_8px_#06b6d4] scale-105'
+                        : 'hover:text-cyan-400 hover:shadow-[0_0_8px_#06b6d4]'
+                    }`}
+                  >
+                    [ {label} ]
+                    {activeSection === id && (
+                      <div className="h-[2px] bg-cyan-400 mt-1 rounded-full shadow-[0_0_6px_#06b6d4] animate-[scaleIn_0.3s_ease-out]" />
+                    )}
+                  </button>
+                ))}
             </nav>
+
+            {/* Mobile hamburger */}
+            <button
+              className="md:hidden text-cyan-500 hover:text-cyan-400 transition-colors p-1"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+        </div>
+
+        {/* Mobile menu dropdown */}
+        <div
+          className={`md:hidden overflow-hidden transition-all duration-300 ease-out ${
+            mobileMenuOpen ? 'max-h-60 border-t border-slate-800/60' : 'max-h-0'
+          }`}
+        >
+          <nav className="flex flex-col gap-1 px-6 py-3 font-tech text-xs tracking-widest">
+            {NAV_ITEMS.map(({ id, label }) => (
+              <button
+                key={id}
+                onClick={() => scrollTo(id)}
+                className={`text-left px-3 py-2 rounded transition-all ${
+                  activeSection === id
+                    ? 'text-cyan-400 bg-cyan-500/10 border-l-2 border-cyan-400'
+                    : 'text-cyan-500/70 hover:text-cyan-400 hover:bg-slate-800/50 border-l-2 border-transparent'
+                }`}
+              >
+                [ {label} ]
+              </button>
+            ))}
+          </nav>
         </div>
       </header>
 
       {/* Hero Section with Vanta Background */}
       <VantaBackground>
         <section id="about" className="min-h-[80vh] flex flex-col justify-center items-center py-20 px-6">
-          <TerminalHero 
-            fullName={data.fullName || "Unknown User"}
-            title={data.title || "System Operator"}
-            bio={data.bio || "No biography data detected."}
-          />
+          {/* Two-column hero layout */}
+          <div className="w-full max-w-6xl mx-auto flex flex-col-reverse lg:flex-row items-center gap-8 lg:gap-4">
+            {/* Left: Terminal Hero */}
+            <div className="w-full lg:w-1/2 z-10">
+              <TerminalHero 
+                fullName={data.fullName || "Unknown User"}
+                title={data.title || "System Operator"}
+                bio={data.bio || "No biography data detected."}
+              />
+            </div>
+
+            {/* Right: 3D Neural Core */}
+            <div className="w-full lg:w-1/2 h-[350px] sm:h-[400px] lg:h-[500px] z-10">
+              <HeroCoreScene />
+            </div>
+          </div>
           
           {/* Social Links */}
           <div className="flex gap-4 mt-8 z-10">
@@ -103,10 +200,10 @@ export const Preview: React.FC<PreviewProps> = ({ data }) => {
 
       <main className="max-w-5xl mx-auto px-6 py-12 space-y-24">
 
-        {/* Skills / System Capabilities */}
+        {/* Skills / System Capabilities — 3D Cloud */}
         <ScrollAnimation animation="fade-up">
           <section id="skills" className="space-y-6">
-              <div className="flex items-center gap-4 mb-8">
+              <div className="flex items-center gap-4 mb-4">
                    <div className="h-[1px] flex-1 bg-slate-800"></div>
                    <h4 className="font-hero text-2xl font-bold text-slate-200 flex items-center gap-2 uppercase tracking-widest">
                       <Cpu className="text-cyan-500 animate-pulse" /> System Capabilities
@@ -114,38 +211,11 @@ export const Preview: React.FC<PreviewProps> = ({ data }) => {
                   <div className="h-[1px] flex-1 bg-slate-800"></div>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {data.skills.length > 0 ? (
-                      data.skills.map((skill, index) => {
-                          // Define skill levels (you can customize this)
-                          const skillLevels: Record<string, number> = {
-                            'Node.js': 90,
-                            'Vue.js': 85,
-                            'Next.js': 88,
-                            '.NET 8': 92,
-                            'C#': 90,
-                            'SQL Server': 85,
-                            'MySQL': 83,
-                            'Python': 80,
-                            'SignalR': 85,
-                            'TypeScript': 87,
-                            'Tailwind CSS': 90,
-                          };
-                          
-                          return (
-                            <SkillProgress
-                              key={index}
-                              skill={skill}
-                              level={skillLevels[skill] || 75}
-                              yearsOfExperience={index < 4 ? 2 : 1} // Customize as needed
-                              index={index}
-                            />
-                          );
-                      })
-                  ) : (
-                      <span className="text-slate-600 font-tech">AWAITING DATA INPUT...</span>
-                  )}
-              </div>
+              {data.skills.length > 0 ? (
+                <SkillCloud3D skills={data.skills} />
+              ) : (
+                <span className="text-slate-600 font-tech">AWAITING DATA INPUT...</span>
+              )}
           </section>
         </ScrollAnimation>
 
@@ -166,53 +236,8 @@ export const Preview: React.FC<PreviewProps> = ({ data }) => {
           </ScrollAnimation>
         )}
 
-        {/* Experience / Mission Logs */}
+        {/* Projects / Schematics — matches SCHEMATICS nav item (3rd) before LOGS (4th) */}
         <ScrollAnimation animation="fade-up" delay={200}>
-          <section id="experience" className="space-y-10">
-            <h4 className="font-hero text-3xl font-bold text-white flex items-center gap-3 border-b border-slate-800 pb-4">
-                <Activity className="text-amber-500" /> MISSION LOGS
-            </h4>
-            
-            <div className="relative space-y-12 pl-4 md:pl-0">
-                {/* Timeline Line */}
-                <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-[1px] bg-slate-800 hidden md:block"></div>
-
-                {data.experiences.length > 0 ? (
-                    data.experiences.map((exp, index) => (
-                        <div key={exp.id} className={`relative flex flex-col md:flex-row gap-8 ${index % 2 === 0 ? 'md:flex-row-reverse' : ''}`}>
-                            
-                            {/* Central Node */}
-                            <div className="absolute left-0 md:left-1/2 w-4 h-4 -translate-x-[5px] md:-translate-x-1/2 mt-1.5 bg-slate-950 border-2 border-amber-500 rounded-full z-10 shadow-[0_0_10px_#f59e0b]"></div>
-
-                            <div className="flex-1 ml-6 md:ml-0">
-                                <div className={`bg-slate-900/40 p-6 border-l-2 ${index % 2 === 0 ? 'border-l-amber-500/50' : 'border-l-cyan-500/50'} hover:bg-slate-800/40 transition-colors relative`}>
-                                     {/* Tech Decoration */}
-                                     <div className="absolute top-0 right-0 p-2 opacity-20">
-                                        <div className="w-16 h-16 border-t border-r border-white rounded-tr-lg"></div>
-                                     </div>
-
-                                    <div className="flex flex-col mb-3">
-                                        <span className="font-tech text-xs text-amber-500 mb-1">TIMESTAMP: {exp.period}</span>
-                                        <h5 className="font-hero text-xl font-bold text-white uppercase tracking-wide">{exp.role}</h5>
-                                        <p className="text-sm font-tech text-slate-400">@ {exp.company}</p>
-                                    </div>
-                                    <p className="text-slate-300 text-sm leading-relaxed border-t border-slate-800/50 pt-3">
-                                        {exp.description}
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="flex-1 hidden md:block"></div> 
-                        </div>
-                    ))
-                ) : (
-                    <p className="text-slate-600 font-tech">NO LOGS FOUND...</p>
-                )}
-            </div>
-        </section>
-        </ScrollAnimation>
-
-        {/* Projects / Schematics */}
-        <ScrollAnimation animation="fade-up" delay={300}>
           <section id="projects" className="space-y-10">
             <h4 className="font-hero text-3xl font-bold text-white flex items-center gap-3">
                 <Database className="text-cyan-500" /> PROJECT SCHEMATICS
@@ -247,18 +272,23 @@ export const Preview: React.FC<PreviewProps> = ({ data }) => {
                                         </div>
                                     )}
 
-                                    {project.link && (
+                                    {project.link ? (
                                         <a href={project.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-xs font-tech text-slate-400 hover:text-cyan-400 transition-colors mt-2">
                                             <ExternalLink size={14} /> ACCESS REPOSITORY
                                         </a>
+                                    ) : (
+                                        <div className="inline-flex items-center gap-1.5 mt-2 px-2 py-1 bg-amber-950/40 border border-amber-800/50 rounded-sm">
+                                            <Shield size={11} className="text-amber-600" />
+                                            <span className="font-tech text-[10px] text-amber-700 uppercase tracking-widest">// INTERNAL //</span>
+                                        </div>
                                     )}
                                 </div>
 
                                 {/* Right: Details & Terminal View */}
                                 <div className="md:w-2/3 flex flex-col">
-                                    {/* Project Preview Image (GIF/Static) */}
+                                    {/* Project Preview — Hover to Play GIF */}
                                     {project.image && (
-                                        <div className="mb-4 rounded border border-slate-700 overflow-hidden relative group/image">
+                                        <div className="mb-4 rounded border border-slate-700 overflow-hidden relative group/image h-[180px]">
                                             {/* CRT Overlay */}
                                             <div className="absolute inset-0 bg-cyan-500/5 mix-blend-overlay z-10 pointer-events-none"></div>
                                             <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] bg-[length:100%_4px] pointer-events-none z-20 opacity-20"></div>
@@ -266,11 +296,18 @@ export const Preview: React.FC<PreviewProps> = ({ data }) => {
                                             <img 
                                                 src={project.image} 
                                                 alt={project.title} 
-                                                className="w-full h-auto object-cover opacity-90 group-hover/image:opacity-100 transition-opacity duration-500 grayscale group-hover/image:grayscale-0" 
+                                                className="w-full h-full object-cover opacity-70 group-hover/image:opacity-100 transition-all duration-500 grayscale group-hover/image:grayscale-0 scale-105 group-hover/image:scale-100" 
                                             />
                                             
+                                            {/* Play indicator */}
+                                            <div className="absolute inset-0 z-20 flex items-center justify-center opacity-60 group-hover/image:opacity-0 transition-opacity">
+                                                <div className="w-12 h-12 rounded-full border-2 border-cyan-400/60 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm">
+                                                    <div className="w-0 h-0 border-t-[8px] border-t-transparent border-l-[14px] border-l-cyan-400 border-b-[8px] border-b-transparent ml-1"></div>
+                                                </div>
+                                            </div>
+                                            
                                             {/* Live Tag */}
-                                            <div className="absolute top-2 right-2 bg-red-500/80 text-white text-[10px] font-bold px-2 py-0.5 rounded animate-pulse z-30 font-mono">
+                                            <div className="absolute top-2 right-2 bg-red-500/80 text-white text-[10px] font-bold px-2 py-0.5 rounded opacity-0 group-hover/image:opacity-100 group-hover/image:animate-pulse transition-opacity z-30 font-mono">
                                                 REC ●
                                             </div>
                                         </div>
@@ -314,6 +351,53 @@ export const Preview: React.FC<PreviewProps> = ({ data }) => {
             </div>
           </section>
         </ScrollAnimation>
+
+        {/* Experience / Mission Logs — matches LOGS nav item (4th) */}
+        <ScrollAnimation animation="fade-up" delay={300}>
+          <section id="experience" className="space-y-10">
+            <h4 className="font-hero text-3xl font-bold text-white flex items-center gap-3 border-b border-slate-800 pb-4">
+                <Activity className="text-amber-500" /> MISSION LOGS
+            </h4>
+            
+            <div className="relative space-y-12 pl-4 md:pl-0">
+                {/* Timeline Line */}
+                <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-[1px] bg-slate-800 hidden md:block"></div>
+
+                {data.experiences.length > 0 ? (
+                    data.experiences.map((exp, index) => (
+                        <div key={exp.id} className={`relative flex flex-col md:flex-row gap-8 ${index % 2 === 0 ? 'md:flex-row-reverse' : ''}`}>
+                            
+                            {/* Central Node */}
+                            <div className="absolute left-0 md:left-1/2 w-4 h-4 -translate-x-[5px] md:-translate-x-1/2 mt-1.5 bg-slate-950 border-2 border-amber-500 rounded-full z-10 shadow-[0_0_10px_#f59e0b]"></div>
+
+                            <div className="flex-1 ml-6 md:ml-0">
+                                <div className={`bg-slate-900/40 p-6 border-l-2 ${index % 2 === 0 ? 'border-l-amber-500/50' : 'border-l-cyan-500/50'} hover:bg-slate-800/40 transition-colors relative`}>
+                                     {/* Tech Decoration */}
+                                     <div className="absolute top-0 right-0 p-2 opacity-20">
+                                        <div className="w-16 h-16 border-t border-r border-white rounded-tr-lg"></div>
+                                     </div>
+
+                                    <div className="flex flex-col mb-3">
+                                        <span className="font-tech text-xs text-amber-500 mb-1">TIMESTAMP: {exp.period}</span>
+                                        <h5 className="font-hero text-xl font-bold text-white uppercase tracking-wide">{exp.role}</h5>
+                                        <p className="text-sm font-tech text-slate-400">@ {exp.company}</p>
+                                    </div>
+                                    <p className="text-slate-300 text-sm leading-relaxed border-t border-slate-800/50 pt-3">
+                                        {exp.description}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex-1 hidden md:block"></div> 
+                        </div>
+                    ))
+                ) : (
+                    <p className="text-slate-600 font-tech">NO LOGS FOUND...</p>
+                )}
+            </div>
+        </section>
+        </ScrollAnimation>
+
+
 
         {/* Footer */}
         <footer id="contact" className="pt-20 pb-10 text-center border-t border-slate-800 bg-gradient-to-t from-black to-transparent">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Terminal } from 'lucide-react';
 
 interface TerminalHeroProps {
@@ -20,11 +20,11 @@ export const TerminalHero: React.FC<TerminalHeroProps> = ({ fullName, title, bio
   const [isTypingCommand, setIsTypingCommand] = useState(true);
   const [showCursor, setShowCursor] = useState(true);
 
-  const commands: CommandLine[] = [
+  const commands = useMemo<CommandLine[]>(() => [
     { command: 'whoami', output: fullName, delay: 50 },
     { command: 'cat role.txt', output: `// ${title}`, delay: 40 },
     { command: 'cat bio.txt', output: bio, delay: 20 },
-  ];
+  ], [fullName, title, bio]);
 
   // Blinking cursor effect
   useEffect(() => {
