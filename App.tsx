@@ -19,7 +19,7 @@ const INITIAL_DATA: PortfolioData = {
   email: 'rayhanyoshara@gmail.com',
   linkedin: 'https://www.linkedin.com/in/rayhanyoshara',
   github: 'https://github.com/Rayhanyoshh',
-  skills: ['Node.js', 'Vue.js', 'Next.js', '.NET 8', 'C#', 'SQL Server', 'MySQL', 'Python', 'SignalR', 'TypeScript', 'Tailwind CSS'],
+  skills: ['Node.js', 'Vue.js', 'Next.js', '.NET 8', 'C#', 'SQL Server', 'MySQL', 'Python', 'SignalR', 'TypeScript', 'Tailwind CSS', 'Go', 'Docker', 'Kotlin', 'Android'],
   experiences: [
     {
       id: '1',
@@ -76,6 +76,22 @@ const INITIAL_DATA: PortfolioData = {
       description: "Built an intelligent automation middleware for the Foreman's Work Proof (BKM) process. The system reads and processes Excel attachments directly from Lark, significantly reducing manual labor and human error.",
       tags: ['Node.js', 'Excel Processing', 'Lark Integration'],
       link: ''
+    },
+    {
+      id: 'p7',
+      title: 'Sinik&Simil — Wedding & Pregnancy Guide App',
+      role: 'Android Developer',
+      description: 'A published Android application on Google Play Store designed to guide couples through two of life\'s most important milestones: wedding preparation (Siap Nikah) and pregnancy preparation (Siap Hamil). Features curated article content organized by category (Preparation, Health, Financial, Mental), full-text search & filter, bookmark system, role-based access control (Reader / Admin / SuperAdmin), and Google Sign-In. Built with MVVM architecture on Jetpack Compose with Firebase as the backend.',
+      tags: ['Kotlin', 'Jetpack Compose', 'MVVM', 'Firebase', 'Firestore', 'Firebase Auth', 'Google Sign-In', 'Material Design 3', 'Android'],
+      link: 'https://play.google.com/store/apps/details?id=com.sinik.siniksimil'
+    },
+    {
+      id: 'p6',
+      title: 'GoTracker — Microservices Website Monitor',
+      role: 'Fullstack Developer (Learning Project)',
+      description: 'A fullstack learning project implementing industry-standard Microservices architecture using Go, React, and Docker. The system concurrently monitors website uptime via Goroutines, protected by centralized JWT authentication through a dedicated SSO service. Features a Background Worker for auto-checking all registered sites in parallel, Swagger UI for interactive API docs, and Google OAuth2 login.',
+      tags: ['Go', 'Gin', 'React', 'TypeScript', 'PostgreSQL', 'Docker', 'JWT', 'OAuth2', 'Swagger', 'Goroutines', 'Vite', 'Tailwind CSS'],
+      link: 'https://gotracker-rayhan.vercel.app/'
     }
   ]
 };
